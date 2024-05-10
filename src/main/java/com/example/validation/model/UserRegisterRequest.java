@@ -1,5 +1,7 @@
 package com.example.validation.model;
 
+import com.example.validation.annotation.PhoneNumber;
+import com.example.validation.annotation.YearMonth;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.*;
@@ -9,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Data
@@ -16,8 +19,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class UserRegisterRequest {
-    @NotBlank
     private String name;
+    private String nickName;
 
     @NotBlank
     @Size(min = 1, max = 12)
@@ -31,9 +34,24 @@ public class UserRegisterRequest {
     @Email
     private String email;
 
-    @Pattern(regexp = "^[2-9]\\d{2}-\\d{3}-\\d{4}$")
+    @PhoneNumber
     private String phoneNumber;
 
     @FutureOrPresent
     private LocalDateTime registerAt;
+
+    @YearMonth(pattern = "yyyy-MM")
+    private String birthDayYearMonth;
+    //custom validation
+    //AssertTrue 어노테이션은 is로 시작하는 메소드에 붙여줘야지만이 제대로 동작한다.
+    @AssertTrue(message = "name or nickname 은 존재해야 합니다.")
+    public boolean isNameCheck(){
+        if(Objects.nonNull(name) && !name.isBlank()){
+            return true;
+        }
+        if(Objects.nonNull(nickName) && !nickName.isBlank()) {
+            return true;
+        }
+        return false;
+    }
 }
